@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MathTistic</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--bg1:#000000;--bg2:#0c0d14;--card:#12131a;--ink:#f2f4f8;--mut:#a3a9b8;--acc:#6ea8ff;--accink:#05070d;--line:#2a2d3a;--ok:#4cc38a;--bad:#ff7a6b;--sym:rgba(110,168,255,.16);color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg1:#000000;--bg2:#0c0d14;--card:#12131a;--ink:#f2f4f8;--mut:#a3a9b8;--acc:#6ea8ff;--accink:#05070d;--line:#2a2d3a;--ok:#4cc38a;--bad:#ff7a6b;--sym:rgba(110,168,255,.16)}}
+:root[data-theme="dark"]{--bg1:#000000;--bg2:#0c0d14;--card:#12131a;--ink:#f2f4f8;--mut:#a3a9b8;--acc:#6ea8ff;--accink:#05070d;--line:#2a2d3a;--ok:#4cc38a;--bad:#ff7a6b;--sym:rgba(110,168,255,.16)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:linear-gradient(135deg,var(--bg1),var(--bg2));display:flex;align-items:center;justify-content:center;padding:24px 16px;position:relative;overflow-x:hidden}
+.sym{position:fixed;inset:0;pointer-events:none;font-family:Georgia,serif;color:var(--sym);overflow:hidden}
+.sym span{position:absolute;font-size:var(--s);left:var(--x);top:var(--y);transform:rotate(var(--r))}
+main{position:relative;width:100%;max-width:980px}
+h1{text-align:center;font-size:clamp(22px,4vw,32px);margin:0 0 6px}
+.sub{text-align:center;color:var(--mut);margin:0 0 22px}
+.row{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;align-items:stretch}
+.card{flex:1 1 340px;max-width:470px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 10px 30px rgba(20,40,90,.12)}
+.card h2{margin:0 0 4px;font-size:19px}
+.card p.d{margin:0 0 16px;color:var(--mut);font-size:14px}
+label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+input[type=text]{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;font-size:16px;background:transparent;color:var(--ink)}
+input[type=file]{width:100%;font-size:14px;color:var(--ink);padding:10px;border:1px dashed var(--line);border-radius:10px}
+.btns{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+button{flex:1 1 130px;padding:12px 14px;border-radius:10px;border:1px solid var(--acc);font-size:15px;font-weight:600;cursor:pointer;background:var(--acc);color:var(--accink)}
+button.alt{background:transparent;color:var(--acc)}
+button:disabled{opacity:.55;cursor:wait}
+[hidden]{display:none!important}
+.res strong{color:var(--ink);background:rgba(110,168,255,.22);padding:1px 4px;border-radius:4px;font-weight:700}
+.res h3{border-left:3px solid var(--acc);padding-left:8px;color:var(--acc)}
+.res li.ok::marker{color:var(--ok)}.res li.bad::marker{color:var(--bad)}
+.res li,.res p{line-height:1.5}
+.tabs{display:flex;gap:8px;justify-content:center;margin:0 0 18px}
+.tab{flex:0 1 190px;background:transparent;color:var(--acc)}
+.tab.on{background:var(--acc);color:var(--accink)}
+.dash{display:flex;gap:16px;flex-wrap:wrap}
+.panel{flex:1 1 300px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 10px 30px rgba(20,40,90,.12)}
+.panel.w{flex-basis:100%}
+.panel h2{margin:0 0 12px;font-size:17px}
+.kpis{display:flex;gap:12px;flex-wrap:wrap}
+.kpi{flex:1 1 130px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center}
+.kpi b{display:block;font-size:26px;color:var(--acc)}.kpi span{font-size:12px;color:var(--mut)}
+.hb{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:13px}
+.hb .l{flex:0 0 38%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hb .t{flex:1;height:10px;background:var(--line);border-radius:6px;overflow:hidden}
+.hb .t i{display:block;height:100%}
+.hb .n{flex:0 0 58px;text-align:right;color:var(--mut)}
+.li2{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.li2 button{flex:0 0 auto;padding:6px 12px;font-size:13px}
+.chip{flex:1 1 0;min-width:0;padding:9px 0;background:transparent;color:var(--acc)}
+.chip.on{background:var(--acc);color:var(--accink)}
+.fb{position:relative;display:block;text-align:center;padding:12px 14px;border:1px dashed var(--acc);border-radius:10px;color:var(--acc);font-weight:600;cursor:pointer;overflow:hidden}
+.fb input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:0}
+textarea{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;font-size:16px;font-family:inherit;background:transparent;color:var(--ink);resize:vertical}
+.st{margin-top:12px;font-size:14px;color:var(--mut);min-height:20px}
+.st.err{color:var(--bad)}
+#res{margin-top:16px;font-size:14px}
+.sc{font-size:28px;font-weight:700}
+.bar{height:10px;background:var(--line);border-radius:6px;overflow:hidden;margin:6px 0 12px}
+.bar i{display:block;height:100%;background:var(--ok)}
+.res h3{margin:14px 0 6px;font-size:14px}
+.res ul{margin:0;padding-left:18px}.res li{margin-bottom:4px}
+.q{display:flex;gap:8px;align-items:flex-start;margin-bottom:4px}
+.q b{min-width:26px}.q .ok{color:var(--ok)}.q .bad{color:var(--bad)}
+</style>
+</head>
+<body>
+<div class="sym" aria-hidden="true" id="sym"></div>
+<main>
+<h1>MathTistic</h1>
+<p class="sub">Estilo ENEM, Unicamp e Fuvest · 6 questões, nível médio e difícil</p>
+<div class="tabs"><button class="tab on" id="t1">Criar e analisar</button><button class="tab" id="t2">Estatísticas</button></div>
+<div class="row" id="v1">
+  <section class="card">
+    <h2>Criar lista</h2>
+    <p class="d">Digite o assunto de matemática e gere sua lista em PDF.</p>
+    <label for="assunto">Assunto</label>
+    <input type="text" id="assunto" placeholder="Ex.: Probabilidade, Funções, Geometria analítica" autocomplete="off">
+    <div class="btns">
+      <button id="bCriar">Criar lista</button>
+    </div>
+    <div class="st" id="st1"></div>
+  </section>
+  <section class="card">
+    <h2>Analisar minha resolução</h2>
+    <p class="d">Analise a resolução de qualquer questão, mesmo fora da lista: o app interpreta o enunciado, mostra como resolver e aponta onde você errou.</p>
+    <label>Foto da questão resolvida</label>
+    <div class="fb">Escolher foto ou arquivo<input type="file" id="arq" accept=".txt,.md,image/*"></div>
+    <div class="st" id="fn" style="margin-top:6px">Nenhum arquivo selecionado</div>
+    <div class="btns"><button id="bAn">Analisar resolução</button></div>
+    <div class="st" id="st2"></div>
+    <div id="res" class="res"></div>
+  </section>
+</div>
+<div id="v2" hidden></div>
+</main>
+<script>
+(function(){
+var S=["∑","π","√","∫","x²","∞","÷","θ","Δ","≈","%","f(x)","±","sen","log"];
+var sy=document.getElementById("sym");
+S.forEach(function(t,i){var e=document.createElement("span");e.textContent=t;e.style.setProperty("--x",(i*37%92)+"%");e.style.setProperty("--y",(i*53%90)+"%");e.style.setProperty("--s",(28+(i*13%40))+"px");e.style.setProperty("--r",((i*29%50)-25)+"deg");sy.appendChild(e)});
+
+var $=function(i){return document.getElementById(i)};
+var lista=null;
+try{var sv=localStorage.getItem("lista");if(sv)lista=JSON.parse(sv)}catch(e){}
+
+function status(id,msg,err){var e=$(id);e.textContent=msg;e.className="st"+(err?" err":"")}
+var MAP={"−":"-","–":"-","—":"-","×":"x","÷":"/","≤":"<=","≥":">=","≠":"!=","≈":"~","π":"pi","√":"raiz","∞":"infinito","·":".","’":"'","“":"\"","”":"\"","θ":"teta","Δ":"delta","∑":"soma","∫":"integral","±":"+-","→":"->"};
+function san(t){return String(t==null?"":t).replace(/[^\x00-\xFF]/g,function(c){return MAP[c]!==undefined?MAP[c]:"?"})}
+
+async function pegaSample(){
+  var s=await claude.use("sample");
+  if(!s)throw new Error("Recurso de IA indisponível nesta visualização.");
+  return s;
+}
+
+function montaPdf(l,modo){
+  var J=window.jspdf.jsPDF,d=new J({unit:"mm",format:"a4"}),W=210,M=18,y=M,mw=W-2*M;
+  function need(h){if(y+h>297-M){d.addPage();y=M}}
+  function tx(t,sz,b,gap){d.setFont("helvetica",b?"bold":"normal");d.setFontSize(sz);var ls=d.splitTextToSize(san(t),mw);ls.forEach(function(x){need(sz*0.5);d.text(x,M,y);y+=sz*0.45});y+=gap||0}
+  if(modo!=="gab"){
+    tx("Lista de Matemática - "+l.assunto,16,true,2);
+    tx("6 questões objetivas · estilo ENEM, Unicamp e Fuvest · nível médio e difícil",9,false,6);
+    l.questoes.forEach(function(q){
+      need(30);tx("Questão "+q.n+"  ("+q.estilo+" · "+q.nivel+")",11,true,2);
+      tx(q.enunciado,11,false,2);
+      q.alternativas.forEach(function(a,i){tx("("+"ABCDE"[i]+") "+a,11,false,1)});y+=5;
+    });
+    d.addPage();y=M;
+  }
+  tx("Gabarito - "+l.assunto,16,true,6);
+  l.questoes.forEach(function(q){tx("Questão "+q.n+": alternativa "+q.correta+"  ["+q.topico+"]",11,true,1);if(modo==="gab")tx(q.resolucao,10,false,4);else y+=1});
+  return d.output("blob");
+}
+async function salva(blob,nome){
+  var dl=await claude.use("downloads");
+  if(!dl)throw new Error("Download indisponível nesta visualização.");
+  await dl.save({filename:nome,data:blob});
+}
+function nomeArq(a){return a.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,40)||"lista"}
+
+$("bCriar").onclick=async function(){
+  var a=$("assunto").value.trim();if(!a){status("st1","Digite um assunto de matemática primeiro.",true);return}
+  var b=this;b.disabled=true;status("st1","Montando as 6 questões… pode levar alguns segundos.");
+  try{
+    var s=await pegaSample();
+    var p="Você é um elaborador de questões de vestibular de matemática. Crie exatamente 6 questões objetivas de múltipla escolha (5 alternativas, A a E, apenas uma correta) sobre o assunto: \""+a+"\". Siga o estilo, os editais e o nível de dificuldade do ENEM, da 1ª fase da Unicamp e da 1ª fase da Fuvest (distribua entre as três bancas). Dificuldade: 3 questões de nível \"média\" e 3 de nível \"difícil\", em ordem crescente. Enunciados completos e autossuficientes, sem figuras. Use SOMENTE caracteres Latin-1 (acentos permitidos); escreva raiz como raiz(x), potências como x^2, frações como a/b, sem LaTeX nem símbolos matemáticos Unicode. As alternativas não levam a letra no início. Responda SOMENTE com JSON no formato: {\"questoes\":[{\"n\":1,\"estilo\":\"ENEM\",\"nivel\":\"média\",\"topico\":\"subtópico cobrado\",\"enunciado\":\"...\",\"alternativas\":[\"...\",\"...\",\"...\",\"...\",\"...\"],\"correta\":\"C\",\"resolucao\":\"resolução resumida passo a passo\"}]}";
+    var r=await s.json(p,{modelTier:"complex",cache:false});
+    var q=r&&r.questoes;if(!q||q.length!==6||q.some(function(x){return !x.alternativas||x.alternativas.length!==5}))throw new Error("A lista veio incompleta. Tente novamente.");
+    lista={id:"l"+Date.now(),ts:Date.now(),assunto:a,questoes:q};
+    try{localStorage.setItem("lista",JSON.stringify(lista))}catch(e){}
+    guardaLista(lista);
+    await salva(montaPdf(lista,"lista"),"lista-"+nomeArq(a)+".pdf");
+    window.__bg&&window.__bg();status("st1","Lista pronta! O PDF tem as questões e, no fim, uma página separada com o gabarito.");
+  }catch(e){status("st1",(e&&e.code==="declined")?"Download cancelado. Clique em Criar lista para tentar de novo.":(e&&e.message)||"Não foi possível criar a lista.",true)}
+  b.disabled=false;
+};
+
+var _g=$("bGab");if(_g)_g.onclick=async function(){
+  if(!lista){status("st1","Crie uma lista primeiro para gerar o gabarito.",true);return}
+  try{await salva(montaPdf(lista,"gab"),"gabarito-"+nomeArq(lista.assunto)+".pdf");status("st1","Gabarito comentado gerado para a lista de “"+lista.assunto+"”.")}
+  catch(e){status("st1",(e&&e.message)||"Não foi possível gerar o gabarito.",true)}
+};
+
+function li(ul,arr){(arr||[]).forEach(function(t){var e=document.createElement("li");rich(e,t);ul.appendChild(e)})}
+function secao(box,tit,arr){if(!arr||!arr.length)return;var h=document.createElement("h3");h.textContent=tit;var u=document.createElement("ul");li(u,arr);box.appendChild(h);box.appendChild(u)}
+
+$("bAn").onclick=async function(){
+  var f=$("arq").files[0],tx=$("txt").value.trim();if(!f&&!tx){status("st2","Escolha um arquivo ou digite suas respostas.",true);return}
+  var b=this;b.disabled=true;$("res").textContent="";status("st2","Analisando suas respostas…");
+  try{
+    var s=await pegaSample();
+    var gab=lista?"Gabarito da última lista gerada neste app (assunto: "+lista.assunto+"):\n"+lista.questoes.map(function(q){return q.n+") correta "+q.correta+" | tópico: "+q.topico+" | enunciado: "+q.enunciado+" | alternativas: "+q.alternativas.join(" / ")}).join("\n"):"Nenhuma lista foi gerada neste app; use o gabarito presente no arquivo, se houver.";
+    var p="Você é um professor de matemática de cursinho. Analise a resolução enviada pelo aluno, comparando com o gabarito. "+gab+"\n\nSe o arquivo corresponder a outra lista, use as informações do próprio arquivo e diga o que não foi possível avaliar. Responda SOMENTE com JSON: {\"total\":0,\"acertos\":0,\"por_questao\":[{\"n\":1,\"topico\":\"...\",\"acertou\":true,\"obs\":\"comentário curto\"}],\"fortes\":[\"pontos fortes\"],\"revisar\":[\"tópicos a revisar, com sugestão objetiva\"],\"resumo\":\"2 frases\"}";
+    var opts={modelTier:"default",cache:false},inp=p;
+    if(f&&f.type.indexOf("image/")===0){var lm=await s.limits();if(!lm||!lm.images)throw new Error("Envio de imagens indisponível aqui. Use um arquivo de texto.");opts.images=[f]}
+    else inp=p+"\n\nRESPOSTAS DO ALUNO:\n"+((f?await f.text():"")+"\n"+tx).slice(0,20000);
+    var r=await s.json(inp,opts);
+    var box=$("res");box.textContent="";
+    var pct=r.total?Math.round(100*r.acertos/r.total):0;
+    var sc=document.createElement("div");sc.className="sc";sc.textContent=r.acertos+" de "+r.total+" ("+pct+"%)";box.appendChild(sc);
+    var bar=document.createElement("div");bar.className="bar";var i=document.createElement("i");i.style.width=pct+"%";bar.appendChild(i);box.appendChild(bar);
+    if(r.resumo){var p2=document.createElement("p");p2.textContent=r.resumo;box.appendChild(p2)}
+    (r.por_questao||[]).forEach(function(x){var d=document.createElement("div");d.className="q";var n=document.createElement("b");n.textContent=x.n+".";var m=document.createElement("span");m.className=x.acertou?"ok":"bad";m.textContent=(x.acertou?"✓ ":"✗ ")+(x.topico||"")+(x.obs?" - "+x.obs:"");d.appendChild(n);d.appendChild(m);box.appendChild(d)});
+    secao(box,"Pontos fortes",r.fortes);secao(box,"Pontos a revisar",r.revisar);
+    status("st2","Análise concluída.");
+  }catch(e){status("st2",(e&&e.message)||"Não foi possível analisar o arquivo.",true)}
+  b.disabled=false;
+};
+$("arq").onchange=function(){$("fn").textContent=this.files[0]?this.files[0].name:"Nenhum arquivo selecionado"};
+function par(box,t){var e=document.createElement("p");e.textContent=t;box.appendChild(e)}
+$("bAn").onclick=async function(){
+ var f=$("arq").files[0],en="",rs="";
+ if(!f){status("st2","Escolha um arquivo para analisar.",true);return}
+ var b=this;b.disabled=true;$("res").textContent="";status("st2","Analisando sua resolução…");
+ try{
+  var s=await pegaSample();
+  var p="Você é um professor de matemática de cursinho. Interprete a questão e a resolução do aluno (na foto e/ou no texto abaixo). Resolva a questão corretamente você mesmo, depois compare com a resolução do aluno e identifique exatamente onde e por que ele errou (ou confirme que acertou). Se a foto estiver ilegível, diga o que não deu para ler. Responda SOMENTE com JSON: {\"questao\":\"enunciado interpretado, resumido\",\"assunto\":\"assunto de matemática\",\"resposta_correta\":\"...\",\"resolucao_correta\":[\"passo 1\",\"passo 2\"],\"resultado\":\"correta|parcialmente correta|incorreta\",\"erros\":[{\"onde\":\"passo ou linha\",\"o_que_errou\":\"...\",\"correcao\":\"...\"}],\"acertos\":[\"o que o aluno fez bem\"],\"revisar\":[\"tópicos a revisar\"],\"dica\":\"uma dica final\"}";
+  var opts={modelTier:"complex",cache:false},inp=p,ft="";
+  if(f&&f.type.indexOf("image/")===0){var lm=await s.limits();if(!lm||!lm.images)throw new Error("Envio de imagens indisponível aqui.");opts.images=[f]}
+  else if(f)ft=(await f.text()).slice(0,15000);
+  inp+=(ft?"\n\nARQUIVO:\n"+ft:"")+(en?"\n\nENUNCIADO:\n"+en:"")+(rs?"\n\nRESOLUÇÃO DO ALUNO:\n"+rs:"");
+  var r=await s.json(inp,opts),box=$("res");box.textContent="";
+  var h=document.createElement("div");h.className="sc";h.textContent=(r.resultado||"");box.appendChild(h);
+  if(r.assunto)par(box,"Assunto: "+r.assunto);
+  if(r.questao)par(box,"Questão: "+r.questao);
+  if(r.resposta_correta)par(box,"Resposta correta: "+r.resposta_correta);
+  secao(box,"Como resolver",r.resolucao_correta);
+  var ee=(r.erros||[]).map(function(x){return (x.onde?x.onde+": ":"")+x.o_que_errou+(x.correcao?" → "+x.correcao:"")});
+  secao(box,"Onde você errou",ee);secao(box,"O que você fez bem",r.acertos);secao(box,"Revisar",r.revisar);
+  if(r.dica){var h3=document.createElement("h3");h3.textContent="Dica";box.appendChild(h3);par(box,r.dica)}
+  status("st2","Análise concluída.");
+ }catch(e){status("st2",(e&&e.message)||"Não foi possível analisar.",true)}
+ b.disabled=false};
+
+var DB=null;
+var ready=(async function(){try{var us=await claude.use("user"),d=await claude.use("db");if(us&&d){var id=await us.id();if(id)DB=d.collection("data/users/"+id)}}catch(e){}})();
+async function dbLoad(k){await ready;try{if(DB){var s=await DB.doc(k).get();if(s.exists){var v=s.data();return (v&&v.items)||[]}return []}}catch(e){}try{return JSON.parse(localStorage.getItem("k_"+k)||"[]")}catch(e){return []}}
+async function dbSave(k,a){await ready;try{if(DB){await DB.doc(k).set({items:a});return}}catch(e){}try{localStorage.setItem("k_"+k,JSON.stringify(a))}catch(e){}}
+async function guardaLista(l){var a=await dbLoad("listas");if(!a.some(function(x){return x.id===l.id})){a.push(l);await dbSave("listas",a.slice(-30))}}
+ready.then(function(){if(lista){if(!lista.id){lista.id="l"+Date.now();lista.ts=Date.now();try{localStorage.setItem("lista",JSON.stringify(lista))}catch(e){}}guardaLista(lista)}});
+
+function E(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function nz(s){s=String(s||"Geral").trim();return s.charAt(0).toUpperCase()+s.slice(1).toLowerCase()}
+function cor(p){return p>=70?"var(--ok)":p>=45?"#d99a00":"var(--bad)"}
+function hb(c,l,pct,txt,col){var r=E("div","hb");r.appendChild(E("span","l",l));var t=E("div","t");var i=E("i");i.style.width=Math.max(2,pct)+"%";i.style.background=col||cor(pct);t.appendChild(i);r.appendChild(t);r.appendChild(E("span","n",txt));c.appendChild(r)}
+function pn(root,tit,w){var p=E("div","panel"+(w?" w":""));p.appendChild(E("h2",null,tit));root.appendChild(p);return p}
+function grp(a,fn){var m={};a.forEach(function(x){var k=fn(x);if(k==null||k==="")return;(m[k]=m[k]||[]).push(x)});return m}
+function med(v){return Math.round(100*v.reduce(function(s,x){return s+x.sc},0)/v.length)}
+function par(box,t){var e=document.createElement("p");e.textContent=t;box.appendChild(e)}
+
+async function renderStats(){
+ var root=$("v2");root.textContent="";
+ var L=await dbLoad("listas"),A=await dbLoad("analises"),tot=A.length;
+ var k=E("div","kpis");
+ [[L.length,"listas criadas"],[tot,"questões analisadas"],[tot?med(A)+"%":"-","aproveitamento"],[A.filter(function(x){return x.sc===1}).length,"resoluções corretas"]].forEach(function(x){var d=E("div","kpi");d.appendChild(E("b",null,x[0]));d.appendChild(E("span",null,x[1]));k.appendChild(d)});
+ root.appendChild(k);
+ var dash=E("div","dash");dash.style.marginTop="16px";root.appendChild(dash);
+ if(!tot){pn(dash,"Dashboard",true).appendChild(E("p","st","Envie resoluções na aba Criar e analisar para ver aqui seus pontos fortes e fracos."))}
+ else{
+  var ga=grp(A,function(x){return x.assunto}),as=Object.keys(ga).map(function(n){return{n:n,c:ga[n].length,p:med(ga[n])}}).sort(function(a,b){return b.p-a.p});
+  var pa=pn(dash,"Desempenho por assunto",true);as.forEach(function(x){hb(pa,x.n,x.p,x.p+"% ("+x.c+")")});
+  var pf=pn(dash,"Pontos fortes"),fo=as.filter(function(x){return x.p>=70});
+  if(fo.length)fo.slice(0,4).forEach(function(x){hb(pf,x.n,x.p,x.p+"%")});else pf.appendChild(E("p","st","Ainda sem assuntos acima de 70%."));
+  var pw=pn(dash,"Pontos fracos"),fr=as.filter(function(x){return x.p<70}).reverse();
+  if(fr.length)fr.slice(0,4).forEach(function(x){hb(pw,x.n,x.p,x.p+"%")});else pw.appendChild(E("p","st","Nenhum ponto fraco por enquanto."));
+  var pr=pn(dash,"Resultado das resoluções");
+  [["Corretas",1,"var(--ok)"],["Parciais",0.5,"#d99a00"],["Incorretas",0,"var(--bad)"]].forEach(function(z){var n=A.filter(function(x){return x.sc===z[1]}).length;hb(pr,z[0],100*n/tot,n,z[2])});
+  var te=grp([].concat.apply([],A.map(function(x){return x.tipos||[]})).map(function(t){return{t:String(t||"").toLowerCase()}}),function(x){return x.t}),tk=Object.keys(te).sort(function(a,b){return te[b].length-te[a].length}),pt=pn(dash,"Tipos de erro mais comuns");
+  if(tk.length)tk.slice(0,5).forEach(function(t){hb(pt,t,100*te[t].length/te[tk[0]].length,te[t].length,"var(--acc)")});else pt.appendChild(E("p","st","Sem erros registrados."));
+  var gd=grp(A,function(x){return x.dif?nz(x.dif):""}),pd=pn(dash,"Aproveitamento por dificuldade");
+  if(Object.keys(gd).length)Object.keys(gd).forEach(function(d){hb(pd,d,med(gd[d]),med(gd[d])+"% ("+gd[d].length+")")});else pd.appendChild(E("p","st","Sem dados."));
+  var pe=pn(dash,"Evolução"),rs=A.slice(-20).map(function(x,i,a){return med(a.slice(Math.max(0,i-2),i+1))});
+  if(rs.length<2)pe.appendChild(E("p","st","Analise ao menos 2 questões para ver a evolução."));
+  else{var NS="http://www.w3.org/2000/svg",sg=document.createElementNS(NS,"svg");sg.setAttribute("viewBox","0 0 300 100");sg.style.width="100%";
+   var pl=document.createElementNS(NS,"polyline");pl.setAttribute("points",rs.map(function(v,i){return (10+i*280/(rs.length-1)).toFixed(1)+","+(90-v*0.8).toFixed(1)}).join(" "));pl.setAttribute("fill","none");pl.setAttribute("stroke","var(--acc)");pl.setAttribute("stroke-width","2.5");sg.appendChild(pl);pe.appendChild(sg);pe.appendChild(E("p","st","Média móvel (3 resoluções) das últimas "+rs.length+", de 0 a 100%."))}
+  var rv=grp([].concat.apply([],A.map(function(x){return (x.rev||[]).map(function(t){return{t:String(t).trim().toLowerCase()}})})),function(x){return x.t}),rk=Object.keys(rv).sort(function(a,b){return rv[b].length-rv[a].length}),pv=pn(dash,"Tópicos que mais pedem revisão");
+  if(rk.length){var ul=E("ul");rk.slice(0,6).forEach(function(t){ul.appendChild(E("li",null,t+(rv[t].length>1?" ("+rv[t].length+"x)":"")))});pv.appendChild(ul)}else pv.appendChild(E("p","st","Nada para revisar por enquanto."));
+  var ph=pn(dash,"Histórico recente",true);
+  A.slice(-8).reverse().forEach(function(x){var r=E("div","li2");r.appendChild(E("span",null,new Date(x.ts).toLocaleDateString("pt-BR")+" · "+x.assunto));r.appendChild(E("span",null,x.res||""));ph.appendChild(r)});
+ }
+ var pl2=pn(dash,"Listas salvas",true);
+ if(!L.length)pl2.appendChild(E("p","st","As listas que você criar aparecem aqui."));
+ L.slice().reverse().forEach(function(l){var r=E("div","li2");r.appendChild(E("span",null,l.assunto+" · "+new Date(l.ts||Date.now()).toLocaleDateString("pt-BR")));var bt=E("button","alt","Baixar PDF");bt.onclick=function(){salva(montaPdf(l,"lista"),"lista-"+nomeArq(l.assunto)+".pdf").catch(function(){})};r.appendChild(bt);pl2.appendChild(r)});
+}
+function aba(n){$("v1").hidden=n!==1;$("v2").hidden=n!==2;$("t1").classList.toggle("on",n===1);$("t2").classList.toggle("on",n===2);if(n===2)renderStats()}
+$("t1").onclick=function(){aba(1)};$("t2").onclick=function(){aba(2)};
+
+$("bAn").onclick=async function(){
+ var f=$("arq").files[0];
+ if(!f){status("st2","Escolha um arquivo para analisar.",true);return}
+ var b=this;b.disabled=true;$("res").textContent="";status("st2","Analisando em detalhe… pode levar um pouco.");
+ try{
+  var s=await pegaSample();
+  var p=`Você é um professor particular de matemática, especialista em ENEM, Unicamp e Fuvest. O arquivo traz uma questão e a resolução feita pelo aluno. Faça uma análise MUITO detalhada: (1) interprete a questão; (2) resolva-a corretamente por conta própria; (3) percorra a resolução do aluno passo a passo, dizendo o que ele fez e se cada passo está certo, parcial ou errado, e por quê; (4) liste o que ele deixou de fazer (passos omitidos, verificações, justificativas, simplificações); (5) classifique cada erro como conceitual, cálculo, interpretação, procedimento ou desatenção; (6) mostre o melhor jeito de resolver (mais rápido e seguro em prova), com passo a passo e atalhos, e diga se o caminho do aluno foi eficiente ou se havia um caminho melhor; (7) dê dicas práticas de prova e tópicos a revisar. Se a resolução do aluno já foi o melhor jeito, diga isso. Se algo estiver ilegível, diga o que não deu para ler e não invente. Escreva em português claro, com equações em texto simples. Destaque em negrito, usando dois asteriscos (**assim**), as partes mais importantes de cada texto: o erro principal, a resposta final, a ideia-chave, o atalho e a dica mais valiosa; use poucos destaques por frase. Responda SOMENTE com JSON: {"questao":"...","assunto":"assunto de matemática curto","dificuldade":"fácil|média|difícil","resultado":"correta|parcialmente correta|incorreta","resposta_correta":"...","resposta_aluno":"...","passos_aluno":[{"passo":"o que o aluno fez","avaliacao":"certo|parcial|errado","comentario":"..."}],"deixou_de_fazer":["..."],"erros":[{"onde":"...","tipo":"conceitual|cálculo|interpretação|procedimento|desatenção","o_que_errou":"...","correcao":"..."}],"eficiencia":"ótima|boa|longa demais","melhor_jeito":["passo 1","passo 2"],"dicas":["..."],"revisar":["..."]}`;
+  var opts={modelTier:"complex",cache:false},inp=p;
+  if(f.type.indexOf("image/")===0){var lm=await s.limits();if(!lm||!lm.images)throw new Error("Envio de imagens indisponível aqui.");opts.images=[f]}
+  else inp+="\n\nARQUIVO:\n"+(await f.text()).slice(0,15000);
+  var r=await s.json(inp,opts),box=$("res");box.textContent="";
+  var sd=E("div","sc",r.resultado||"");sd.style.color=/parcial/i.test(r.resultado||"")?"#d99a00":/^correta/i.test(r.resultado||"")?"var(--ok)":"var(--bad)";box.appendChild(sd);
+  if(r.assunto)par(box,"Assunto: "+r.assunto+(r.dificuldade?" · nível "+r.dificuldade:""));
+  if(r.questao)par(box,"Questão: "+r.questao);
+  if(r.resposta_correta)par(box,"Resposta correta: "+r.resposta_correta+(r.resposta_aluno?" | Sua resposta: "+r.resposta_aluno:""));
+  secao(box,"O que você fez",(r.passos_aluno||[]).map(function(x){return (x.avaliacao==="certo"?"✓ ":x.avaliacao==="parcial"?"~ ":"✗ ")+x.passo+(x.comentario?" - "+x.comentario:"")}));
+  secao(box,"O que você deixou de fazer",r.deixou_de_fazer);
+  secao(box,"Onde você errou",(r.erros||[]).map(function(x){return (x.tipo?"["+x.tipo+"] ":"")+(x.onde?x.onde+": ":"")+x.o_que_errou+(x.correcao?" → "+x.correcao:"")}));
+  secao(box,"Melhor jeito de resolver"+(r.eficiencia?" (seu caminho: "+r.eficiencia+")":""),r.melhor_jeito);
+  secao(box,"Dicas",r.dicas);secao(box,"Revisar",r.revisar);
+  var sco=/parcial/i.test(r.resultado||"")?0.5:/^correta/i.test(r.resultado||"")?1:0;
+  var a=await dbLoad("analises");a.push({ts:Date.now(),assunto:nz(r.assunto),dif:r.dificuldade||"",sc:sco,res:r.resultado||"",tipos:(r.erros||[]).map(function(x){return x.tipo}),rev:(r.revisar||[]).slice(0,4)});
+  await dbSave("analises",a.slice(-250));
+  status("st2","Análise concluída e salva na aba Estatísticas.");
+ }catch(e){status("st2",(e&&e.message)||"Não foi possível analisar.",true)}
+ b.disabled=false};
+function rich(el,t){t=String(t==null?"":t);t.split("**").forEach(function(s,i){if(!s)return;if(i%2){var g=document.createElement("strong");g.textContent=s;el.appendChild(g)}else el.appendChild(document.createTextNode(s))});var c=t.charAt(0);if(c==="✓")el.className="ok";else if(c==="✗")el.className="bad"}
+function par(box,t){var e=document.createElement("p");rich(e,t);box.appendChild(e)}
+})();
+</script>
+</body>
+</html>
